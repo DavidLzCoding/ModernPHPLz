@@ -60,3 +60,29 @@ Hello, there!
 <?php endfor; ?>
 ```
 
+## PHP Comments
+
+### one line comment symbol
+For example:
+
+```php
+<?php
+
+// Control
+echo microtime(), "<br />"; // 0.25163600 1292450508
+echo microtime(), "<br />"; // 0.25186000 1292450508
+?>
+
+```
+
+### Multi-line comments symbol
+
+```php
+<?php
+/**
+* The second * here opens the DocBook commentblock, which could later on<br>
+* in your development cycle save you a lot of time by preventing you having to rewrite<br>
+* major documentation parts to generate some usable form of documentation.
+*/
+?>
+```

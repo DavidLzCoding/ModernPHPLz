@@ -1,5 +1,3 @@
 # ModernPHPLz
-Modern php learning resources and learning note...
-...
-。。。
+Modern php learning resources and learning note.
 
