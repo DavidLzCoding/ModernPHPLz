@@ -23,7 +23,7 @@ For example:
 <p>This will also be ignored by PHP and displayed by the browser.</p>
 ```
 
-- php tags can also skip text when interpreter meets function definition syntax..
+- php tags can also skip text when interpreter meets function definition syntax.
 
 ```html
 <html>
