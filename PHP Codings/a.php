@@ -1,16 +1,15 @@
 <html>
-<?php
-echo "hello";
-?>
-
-<a>foo bar</a>
 
 <?php
-$a=100;
-echo $_SERVER;
-echo $_REQUEST;
+$an_int = 1200;
 
-echo phpinfo();
+var_dump($an_int);
+
+echo gettype($an_int);
+
+echo "\n";
+
+var_dump(is_string($an_int));
 ?>
 
 </html>
