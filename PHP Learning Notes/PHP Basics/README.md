@@ -92,8 +92,25 @@ echo microtime(), "<br />"; // 0.25186000 1292450508
 Like other programming languages, PHP provides a series of primitive data types
 
 ### Scalar primitive types
-- bool
-- int
+- bool: True, False
+
+```php
+<?php
+$foo = True; // assign the value TRUE to $foo
+?>
+```
+
+- int: binary integer(base 2), octal integer(base 8), decimal integer(base 10), hex integer(base 16).
+
+```php
+<?php
+$a = 1234; // decimal number
+$a = 0123; // octal number (equivalent to 83 decimal)
+$a = 0x1A; // hexadecimal number (equivalent to 26 decimal)
+$a = 0b11111111; // binary number (equivalent to 255 decimal)
+?>
+```
+
 - float
 - string
 
@@ -112,6 +129,14 @@ Special primitive types provide special usages for programmers.
 - resources
 - NULL
 
+### Check predefined data size about scalar data type
+
+```php
+echo PHP_INT_MAX; //check the maximum representation about int type
+echo PHP_FLOAT_MIN;   //check the minimum representation about float type
+echo PHP_INT_SIZE; //check the storage bit size about int type
+```
+
 
 ### Type check function
 
@@ -124,9 +149,18 @@ is_xx will check the type of special variable, it returns 1 if it's true, it ret
 ![img_1.png](img_1.png)
 
 
-### Type cast
+### PHP type cast rules:
 
-- The casts allowed are:
+Data converts to bool:
+![img_2.png](img_2.png)
+
+
+
+
+
+### Type Manual Cast
+
+- The casts Syntax allowed are:
     - (int) - cast to int
     - (bool) - cast to bool
     - (float) - cast to float
@@ -156,3 +190,4 @@ settype($bar, "string");  // $bar is now "1" (string)
 ?>
 ```
 
+### Type automatic cast
