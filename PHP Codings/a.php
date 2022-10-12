@@ -1,12 +1,8 @@
-<html>
-
 <?php
+$a = array(1 => 'one', 2 => 'two', 3 => 'three');
 
-$nan=acos(8);
-var_dump($nan, is_nan($nan));
+$foo = 1;
 
-?>
 
-</html>
-
+echo $a[$foo];
 

@@ -281,7 +281,7 @@ echo 'Variables do not $expand $either';
 ![img_4.png](img_4.png)
 
 
-### PHP array date type
+### PHP array data type
 
 - What is array in php, how it's implemented?
     - An array in PHP is actually an ordered map. A map is a type that associates values to keys. 
@@ -291,8 +291,8 @@ echo 'Variables do not $expand $either';
     - It can be treated as an array, list (vector), hash table (an implementation of a map), dictionary, collection, stack, queue, and probably more.
     
 
-- Syntax for about using array
-    - The key can either be an int or a string. The value can be of any type.
+#### Syntax for about defining an array
+- The key can either be an int or a string. The value can be of any type.
 
 ```php
 <?php
@@ -310,25 +310,162 @@ $array = [
     "bar" => "foo",
 ];
 
+//Indexed arrays without key
+$array = array("foo", "bar", "hello", "world");
 
 ?>
 ```
 
-- Rule for key value casts:
+#### Rule for array key casting:
+
 ![img_5.png](img_5.png)
   
 ```php
 <?php
-/*
- * "1",1.5,true are all casted to int(1),hence $array will only has 1=>"d" data.
- */
 $array = array(
-    1    => "a",
-    "1"  => "b",
-    1.5  => "c",
-    true => "d",
+    1    => 'a',
+    '1'  => 'b', // the value "a" will be overwritten by "b"
+    1.5  => 'c', // the value "b" will be overwritten by "c"
+    -1 => 'd',
+    '01'  => 'e', // as this is not an integer string it will NOT override the key for 1
+    '1.5' => 'f', // as this is not an integer string it will NOT override the key for 1
+    true => 'g', // the value "c" will be overwritten by "g"
+    false => 'h',
+    '' => 'i',
+    null => 'j', // the value "i" will be overwritten by "j"
+    'k', // value "k" is assigned the key 2. This is because the largest integer key before that was 1
+    2 => 'l', // the value "k" will be overwritten by "l"
 );
+
 var_dump($array);
 ?>
 ```
 
+#### Basic Rule for accessing array elements
+
+- Array elements can be accessed using the array[key] syntax.
+
+```php
+<?php
+$array = array(
+    "foo" => "bar",
+    42    => 24,
+    "multi" => array(
+         "dimensional" => array(
+             "array" => "foo"
+         )
+    )
+);
+
+var_dump($array["foo"]);
+var_dump($array[42]);
+var_dump($array["multi"]["dimensional"]["array"]);
+
+
+// constant and variables can also be used in array[key] syntax
+const FOO="foo";
+var_dump($array[FOO]);   // this will get "bar"
+
+$Foo = "foo";
+var_dump($array[$Foo]);  // this will also get "bar"
+
+
+?>
+```
+
+#### Advanced rule for accessing array elements
+
+Arrays can be destructured using the [] (as of PHP 7.1.0) or list() language constructs. These constructs can be used to destructure an array into distinct variables.
+
+```php
+<?php
+$source_array = ['foo', 'bar', 'baz'];
+// destruct array by assignment statement and [].
+[$foo, $bar, $baz] = $source_array;
+[, ,$baz] = $source_array;    //get the last element only
+
+
+// destruct array by foreach statement and []
+$source_array = [
+    [1, 'John'],
+    [2, 'Jane'],
+];
+
+foreach ($source_array as [$id, $name]) {
+    // logic here with $id and $name
+}
+?>
+```
+
+
+#### Rule for modifying array elements
+
+- Array elements can be modified and added using the array[key] syntax.
+
+- Array and it's elements can be deleted using the unset function.**Be aware that, due to the data structure implementation of Array,the array will not be reindexed. If a true "remove and shift" behavior is desired, the array can be reindexed using the array_values() function.**
+
+```php
+<?php
+$arr = array(5 => 1, 12 => 2);
+
+$arr[] = 56;    // This is the same as $arr[13] = 56;
+                // at this point of the script
+
+$arr["x"] = 42; // This adds a new element to
+                // the array with key "x"
+                
+$arr[13] = 5600; // This will modify 56 to 5600
+
+echo var_dump($arr);
+                
+unset($arr[5]); // This removes the element from the array
+
+echo var_dump($arr);
+
+unset($arr);    // This deletes the whole array
+
+
+
+$a = array(1 => 'one', 2 => 'two', 3 => 'three');
+
+/* will produce an array that would have been defined as
+   $a = array(1 => 'one', 3 => 'three');
+   and NOT
+   $a = array(1 => 'one', 2 =>'three');
+*/
+unset($a[2]);
+
+// Now $b is array(0 => 'one', 1 =>'three')
+$b = array_values($a);
+
+// Now $a will be an empty array
+unset($a);
+?>
+```
+
+#### The array current-maximum-indexing little trap
+
+Note that the maximum integer key used for this need not currently exist in the array. It need only have existed in the array at some time since the last time the array was re-indexed. The following example illustrates:
+
+```php
+<?php
+// Create a simple array.
+$array = array(1, 2, 3, 4, 5);
+print_r($array);
+
+// Now delete every item, but leave the array itself intact:
+foreach ($array as $i => $value) {
+    unset($array[$i]);
+}
+print_r($array);
+
+// Append an item (note that the new key is 5, instead of 0).
+$array[] = 6;
+print_r($array);
+
+// Re-index:
+$array = array_values($array);
+$array[] = 7;
+print_r($array);
+?>
+```
