@@ -1,4 +1,4 @@
 <?php
 
 
-echo intdiv(25,7);
+var_dump( (0.1+0.7) * 10 );

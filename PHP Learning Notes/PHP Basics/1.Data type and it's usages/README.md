@@ -137,11 +137,16 @@ var_dump(intval(25/7));  // float(4)
 ```
 
 
-#### Rules about casting values to integer type:
+#### Rules about casting values to integer value:
 
-#### Rules about casting values to Float type:
+1. **Boolean to Integer:** false will yield 0 (zero), and true will yield 1 (one).
+2. **Float to Integer:** When converting from float to int, the number will be rounded towards zero.
+3. **String to Integer:** If the string is numeric or leading numeric then it will resolve to the corresponding integer value, otherwise it is converted to zero (0).
+4. **NaN,null and Infinity to Integer:** NaN,null and Infinity will always be zero when cast to int.
+
+#### Rules about casting values to Float value:
 
 
-#### Rules about casting values to Boolean type:
+#### Rules about casting values to Boolean value:
 
 
