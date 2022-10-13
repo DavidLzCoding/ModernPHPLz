@@ -11,6 +11,8 @@ In normal, we would use ```<?php   ?>``` paired tags to include php codes, for e
 
 ```
 
+
+
 ### Embedded PHP codes in HTML codes with PHP tages
 
 Everything outside of a pair of opening and closing tags is ignored by the PHP parser which allows PHP to be embedded in HTML documents.
@@ -87,94 +89,15 @@ echo microtime(), "<br />"; // 0.25186000 1292450508
 ?>
 ```
 
-## PHP Data Types
-
-Like other programming languages, PHP provides a series of primitive data types
-
-### Scalar primitive types
-- bool: True, False
-
-```php
-<?php
-$foo = True; // assign the value TRUE to $foo
-?>
-```
-
-- int: binary integer(base 2), octal integer(base 8), decimal integer(base 10), hex integer(base 16).
-
-```php
-<?php
-$a = 1234; // decimal number
-$a = 0123; // octal number (equivalent to 83 decimal)
-$a = 0x1A; // hexadecimal number (equivalent to 26 decimal)
-$a = 0b11111111; // binary number (equivalent to 255 decimal)
-?>
-```
-
-- float
-- string
-
-### Compound primitive types
-Compound primitive types have compound data structure, and it contains some of scalar data.
-
-- array
-- object
-- callable
-- iterable
-
-### Special primitive types
-
-Special primitive types provide special usages for programmers.
-
-- resources
-- NULL
-
-### Check predefined data size about scalar data type
-
-```php
-echo PHP_INT_MAX; //check the maximum representation about int type
-echo PHP_FLOAT_MIN;   //check the minimum representation about float type
-echo PHP_INT_SIZE; //check the storage bit size about int type
-```
 
 
-### Type check function
-
-var_dump will return data type and value of special variable.
-
-gettype will only return data type of special variable.
-
-is_xx will check the type of special variable, it returns 1 if it's true, it returns 0 in contrast.
-
-![img_1.png](img_1.png)
 
 
-### PHP type cast rules:
 
-Data converts to bool:
-![img_2.png](img_2.png)
 
-Data converts to int:
 
-```php
-<?php
-var_dump(25/7);         // float(3.5714285714286)
-var_dump((int) (25/7)); // int(3)
-var_dump(intval(25/7));  // float(4)
 
-/*
- * The rule of string convert to numeric data type like int or float
- */
-$foo = 1 + "10.5";                // $foo is float (11.5)
-$foo = 1 + "-1.3e3";              // $foo is float (-1299)
-$foo = 1 + "bob-1.3e3";           // TypeError as of PHP 8.0.0, $foo is integer (1) previously
-$foo = 1 + "bob3";                // TypeError as of PHP 8.0.0, $foo is integer (1) previously
-$foo = 1 + "10 Small Pigs";       // $foo is integer (11) and an E_WARNING is raised in PHP 8.0.0, E_NOTICE previously
-$foo = 4 + "10.2 Little Piggies"; // $foo is float (14.2) and an E_WARNING is raised in PHP 8.0.0, E_NOTICE previously
-$foo = "10.0 pigs " + 1;          // $foo is float (11) and an E_WARNING is raised in PHP 8.0.0, E_NOTICE previously
-$foo = "10.0 pigs " + 1.0;        // $foo is float (11) and an E_WARNING is raised in PHP 8.0.0, E_NOTICE previously
-?>
-```
+
 
 
 
@@ -279,6 +202,9 @@ echo 'Variables do not $expand $either';
    - If the string is enclosed in double-quotes ("), PHP will interpret  such as \r or \n, will be output as special meaning,For example:
   
 ![img_4.png](img_4.png)
+
+
+#### 
 
 
 ### PHP array data type
