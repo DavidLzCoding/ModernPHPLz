@@ -1,4 +1,11 @@
 <?php
 
+$array = array("a", "b", "c", "d", "e");
+foreach ($array as &$color) {
+    $color = strtoupper($color);
+}
+unset($color); /* ensure that following writes to
+$color will not modify the last array element */
 
-var_dump( (0.1+0.7) * 10 );
+print_r($array);
+?>

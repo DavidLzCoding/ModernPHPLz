@@ -124,7 +124,15 @@ var_dump($large_number);
 
 #### manual data type cast
 
-- use "(type)value" syntax or type cast function will cast data manually.
+- use "(type)value" syntax:
+   - (int) - cast to int
+   - (bool) - cast to bool
+   - (float) - cast to float
+   - (string) - cast to string
+   - (array) - cast to array
+   - (object) - cast to object
+   - (unset) - cast to NULL
+
 
 ```php
 <?php
@@ -132,21 +140,81 @@ var_dump($large_number);
 var_dump((int) (25/7)); // int(3)
 
 // use function intval() to cast value into integer
+var_dump((float)("12.011_Hello word"));  // float(12.011)
+?>
+```
+
+- system predefined function will cast data manually.
+
+```php
+<?php
+// use function intval() to cast value into integer
 var_dump(intval(25/7));  // float(4)
+var_dump(strval(110)); //string("110")
+
+// use function settype to cast variables into another data type
+$foo = "5bar"; // string
+$bar = true;   // boolean
+settype($foo, "integer"); // $foo is now 5   (integer)
+settype($bar, "string");  // $bar is now "1" (string)
 ?>
 ```
 
 
-#### Rules about casting values to integer value:
+#### Rules about casting values to integer type.
 
 1. **Boolean to Integer:** false will yield 0 (zero), and true will yield 1 (one).
 2. **Float to Integer:** When converting from float to int, the number will be rounded towards zero.
 3. **String to Integer:** If the string is numeric or leading numeric then it will resolve to the corresponding integer value, otherwise it is converted to zero (0).
 4. **NaN,null and Infinity to Integer:** NaN,null and Infinity will always be zero when cast to int.
 
-#### Rules about casting values to Float value:
+#### Rules about casting values to Float type.
+
+1. **String to Float:** If the string is numeric or leading numeric then it will resolve to the corresponding float 
+   value, otherwise it is converted to zero (0).
+2. **Other types to Float:** For values of other types, the conversion is performed by converting the value to int first and then to float. See Converting to integer for more information.
 
 
-#### Rules about casting values to Boolean value:
+#### Rules about casting values to String type.
+1. **Boolean to String:** A bool true value is converted to the string "1". bool false is converted to "" (the empty 
+   string).
+2. **integer and float to string:** An int or float is converted to a string representing the number textually.
+
+#### Rules about casting values to Boolean type.
 
 
+### Complex data type 
+
+
+#### Print and Check contents of array, object or resources
+
+Directly converting an array, object, or resource to a string does not provide any useful information about the 
+value beyond its type. See the functions print_r() and var_dump() for more effective means of inspecting the contents of these types.
+
+```php
+<?php
+$a = [1,2,3,4];
+
+//will get "array(4) { [0] => int(1) [1] => int(2) [2] => int(3) [3] => int(4) }"
+var_dump($a);
+
+?>
+```
+
+### Iterable type
+
+Iterable is a pseudo-type introduced in PHP 7.1. It accepts any array or object implementing the Traversable interface. Both of these types are iterable using foreach and can be used with yield from within a generator.
+
+
+
+### Resource type
+A resource is a special variable, holding a reference to an external resource. For example, it can hold special 
+handles to opened files, database connections, image canvas areas and the like, converting to a resource makes no sense.
+
+### NULL 
+The special null value represents a variable with no value. null is the only possible value of type null.
+
+A variable is considered to be null if:
+- it has been assigned the constant null.
+- it has not been set to any value yet.
+- it has been unset().

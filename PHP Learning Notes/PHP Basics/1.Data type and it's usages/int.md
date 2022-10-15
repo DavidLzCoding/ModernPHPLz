@@ -2,7 +2,7 @@
 
 Integer is one of php's data type which stands for value of the set  ℤ = {..., -2, -1, 0, 1, 2, ...}, and represent through decimal (base 10), hexadecimal (base 16), octal (base 8) or binary (base 2) notation.
 
-### Representation of Integer data types
+### Representation of Integer data
 
 ```php
 <?php
