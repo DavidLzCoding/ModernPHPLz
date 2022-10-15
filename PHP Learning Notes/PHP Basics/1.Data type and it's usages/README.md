@@ -3,6 +3,8 @@
 Like other programming languages, PHP provides a series of primitive data types
 
 
+## Define and use different data types
+
 ### Scalar primitive types
 - bool
 - int 
@@ -218,3 +220,78 @@ A variable is considered to be null if:
 - it has been assigned the constant null.
 - it has not been set to any value yet.
 - it has been unset().
+
+## Type declarations
+
+Type declarations can be added to function arguments, return values, and, as of PHP 7.4.0, class properties. They ensure that the value is of the specified type at call time, otherwise a TypeError is thrown.
+
+### Table of type declaration keywords
+
+![img.png](img.png)
+
+
+### Declare the type of function parameters
+
+```php
+<?php
+interface I { public function f(); }
+class C implements I { public function f() {} }
+class D extends C {}
+
+// This doesn't extend C.
+class E {}
+
+function f(C $c) {
+    echo get_class($c)."\n";
+}
+
+function ff(I $i) {
+    echo get_class($i)."\n";
+}
+
+// works
+f(new C);   
+
+// also works due to class D had extends class C
+f(new D);   
+
+// works,due to class C had implements interface I
+ff(new C);  
+
+// not works, due to class E had not implements interface I   
+ff(new E);  
+ 
+// Do not works, because class E has
+// no relationships with C or D
+f(new E);  
+?>
+```
+
+### Basic return type declaration
+
+```php
+<?php
+
+// declare scalar data as return value
+function sum($a, $b): float {
+    return $a + $b;
+}
+
+// Note that a float will be returned.
+var_dump(sum(1, 2));
+
+
+
+// declare object as return value
+class C {}
+
+function getC(): C {
+    return new C;
+}
+
+var_dump(getC());
+
+?>
+```
+
+### 
