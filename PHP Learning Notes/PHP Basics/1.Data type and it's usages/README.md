@@ -1,6 +1,12 @@
 ## PHP Data Types
 
-Like other programming languages, PHP provides a series of primitive data types
+Like other programming languages, PHP provides a series of primitive data types. 
+
+PHP does not require explicit type definition in variable declaration.   
+
+In this case, the type of a variable is determined by the value it stores.   
+
+That is to say, if a string is assigned to variable $var, then $var is of type string. If afterwards an int value is assigned to $var, it will be of type int.
 
 
 ## Define and use different data types
@@ -230,7 +236,7 @@ Type declarations can be added to function arguments, return values, and, as of 
 ![img.png](img.png)
 
 
-### Declare the type of function parameters
+### Declare the basic type of function parameters
 
 ```php
 <?php
@@ -267,6 +273,24 @@ f(new E);
 ?>
 ```
 
+### Declare the pass-by-reference parameters
+
+```php
+<?php
+// pass by reference of array value
+function array_baz(array &$param)
+{
+    $param = 1;
+}
+$var = [];
+array_baz($var);
+var_dump($var);  // array $var has been modified
+array_baz($var);
+?>
+```
+
+
+
 ### Basic return type declaration
 
 ```php
@@ -294,4 +318,68 @@ var_dump(getC());
 ?>
 ```
 
-### 
+### Void return type declaration
+
+void is a return type indicating the function does not return a value. Therefore it cannot be part of a union type declaration. Available as of PHP 7.1.0.
+
+```php
+<?php
+function &test(): void {}
+?>
+```
+
+### Nullable type
+As of PHP 7.1.0, type declarations can be marked nullable by prefixing the type name with a question mark (?). **This 
+signifies that the value can be of the specified type or null.**
+
+```php
+<?php
+
+//nullable parameters declaration
+class C {}
+
+function f(?C $c) {
+    var_dump($c);
+}
+f(new C);
+f(null);
+
+//nullable return type declaration
+function show(?string $name):?string
+{
+    var_dump($name);
+    return $name;
+}
+show('自如初');
+show(null);
+
+
+?>
+```
+
+#### Union types
+A union type declaration accepts values of multiple different simple types, rather than a single one.
+
+```php
+<?php
+class Person
+{
+public function __construct(
+    public string $name,
+    public int $age,
+    // hobbies can accept string or array
+    public string|array $hobbies  
+    )
+    {
+        $this->name = $name;
+        $this->age  = $age;
+        $this->hobbies = $hobbies;
+    }
+}
+
+$p1 = new Person('自如初', 18, 'PHP');
+echo $p1->name;
+$p2 = new Person('PHP博客', 18, ['vue','js']);
+print_r($p2->hobbies);
+?>
+```

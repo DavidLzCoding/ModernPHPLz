@@ -1,11 +1,14 @@
 <?php
+$a = 1;
+$b = 2;
 
-$array = array("a", "b", "c", "d", "e");
-foreach ($array as &$color) {
-    $color = strtoupper($color);
+function Sum()
+{
+    global $a, $b;
+
+    $b = $a + $b;
 }
-unset($color); /* ensure that following writes to
-$color will not modify the last array element */
 
-print_r($array);
+Sum();
+echo $b;   // should be
 ?>
