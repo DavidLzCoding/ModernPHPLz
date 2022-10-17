@@ -1,14 +1,12 @@
 <?php
-$a = 1;
-$b = 2;
-
-function Sum()
+function foo()
 {
-    global $a, $b;
-
-    $b = $a + $b;
+    function bar(){
+        echo "bar";
+    }
+    bar();
+    echo "foo";
 }
-
-Sum();
-echo $b;   // should be
+foo();
+bar();
 ?>

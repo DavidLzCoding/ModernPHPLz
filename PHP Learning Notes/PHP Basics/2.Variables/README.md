@@ -173,6 +173,8 @@ This can cause some problems in that people may inadvertently change a global va
 
 In PHP global variables must be declared global inside a function if they are going to be used in that function.
 
+There is no limit to the number of global variables that can be manipulated by a function.
+
 For example:
 
 ```php
@@ -189,5 +191,64 @@ function Sum()
 
 Sum();
 echo $b;   // should be 3, due to global keywords
+?>
+```
+
+A second way to access variables from the global scope is to use the special PHP-defined $GLOBALS array. The previous example can be rewritten as:
+
+```php
+<?php
+$a = 1;
+$b = 2;
+
+function Sum()
+{
+    $GLOBALS['b'] = $GLOBALS['a'] + $GLOBALS['b'];
+} 
+
+Sum();
+echo $b;
+?>
+```
+
+#### static variable scope
+
+A static variable exists only in a local function scope, but it does not lose its value when program execution leaves this scope.
+
+Now, $a is initialized only in first call of function and every time the test() function is called it will print the value of $a and increment it.
+
+Static variables can be assigned values which are the result of constant expressions, but dynamic expressions, such as function calls, will cause a parse error.
+
+
+```php
+<?php
+function test()
+{
+    static $a = 0;
+    static $int = sqrt(121);  // wrong  (as it is a function)
+    echo $a;
+    $a++;
+}
+?>
+```
+
+
+As of PHP 8.1.0, when a method using static variables is inherited (but not overridden), the inherited method will now share static variables with the parent method. This means that static variables in methods now behave the same way as static properties.
+
+
+```php
+<?php
+class Foo {
+    public static function counter() {
+        static $counter = 0;
+        $counter++;
+        return $counter;
+    }
+}
+class Bar extends Foo {}
+var_dump(Foo::counter()); // int(1)
+var_dump(Foo::counter()); // int(2)
+var_dump(Bar::counter()); // int(3), prior to PHP 8.1.0 int(1)
+var_dump(Bar::counter()); // int(4), prior to PHP 8.1.0 int(2)
 ?>
 ```
