@@ -1,12 +1,9 @@
 <?php
-function foo()
+function makeyogurt2($container = "bowl", $flavour )
 {
-    function bar(){
-        echo "bar";
-    }
-    bar();
-    echo "foo";
+    return "Making a $container of $flavour yogurt.\n";
 }
-foo();
-bar();
+
+//otherwise you  can specify the arguments rule.
+echo makeyogurt2(flavour: "raspberry");
 ?>
