@@ -280,3 +280,4 @@ function &returns_reference()
 $newref =& returns_reference();
 ?>
 ```
+..
