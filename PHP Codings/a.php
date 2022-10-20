@@ -1,9 +1,24 @@
 <?php
-function makeyogurt2($container = "bowl", $flavour )
+class SimpleClass
 {
-    return "Making a $container of $flavour yogurt.\n";
-}
+    // property declaration
+    public $var = 'a default value';
 
-//otherwise you  can specify the arguments rule.
-echo makeyogurt2(flavour: "raspberry");
+    // method declaration
+    public function displayVar() {
+        echo $this->var;
+    }
+}
+$instance = new SimpleClass();
+
+$assigned   =  $instance;
+$reference  =& $instance;
+
+//$instance->var = '$assigned will have this value';
+//
+//$instance = null; // $instance and $reference become null
+
+var_dump($instance);
+var_dump($reference);
+var_dump($assigned);
 ?>

@@ -20,7 +20,9 @@ PHP provides a large number of predefined constants to any script which it runs.
 //
 echo PHP_VERSION;
 echo E_ERROR;
+echo PHP_INT_MIN;
 ```
+
 
 ### PHP magic constants
 
