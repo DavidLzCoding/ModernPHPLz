@@ -132,4 +132,102 @@ echo $obj->foo();  // call the method of instance
 
 **extend only once:** It is not possible to extend multiple classes; a class can only inherit from one base class.
 
-..
+```php
+<?php
+/*
+ * Simple example of class extension
+ */
+class ExtendClass extends SimpleClass
+{
+    // Redefine the parent method
+    function displayVar()
+    {
+        echo "Extending class\n";
+        parent::displayVar();
+    }
+}
+
+$extended = new ExtendClass();
+$extended->displayVar();
+?>
+```
+
+#### compatible child methods
+
+When overriding a method, its signature must be compatible with the parent method.
+
+A signature is compatible if it respects the variance rules, makes a mandatory parameter optional, and if any new parameters are optional. 
+
+```php
+<?php
+
+class Base
+{
+    public function foo(int $a) {
+        echo "Valid\n";
+    }
+}
+
+class Extend1 extends Base
+{
+    function foo(int $a = 5)
+    {
+        parent::foo($a);
+    }
+    
+}
+
+class Extend2 extends Base
+{
+    function foo(int $a, $b = 5)
+    {
+        parent::foo($a);
+    }
+}
+
+$extended1 = new Extend1();
+$extended1->foo();
+$extended2 = new Extend2();
+$extended2->foo(1);
+```
+
+#### ::class 
+
+To obtain the fully qualified name of a class ClassName use ClassName::class. 
+
+```php
+<?php
+namespace NS {
+    class ClassName {
+    }
+    
+    echo ClassName::class;  //will get "NS\ClassName"
+    
+    $c = new ClassName();
+    print $c::class;      // still get "NS\ClassName"
+}
+?>
+```
+
+#### instance null-safe operator
+
+```php
+<?php
+
+// As of PHP 8.0.0, this line:
+$result = $repository?->getUser(5)?->name;
+
+// Is equivalent to the following code block:
+if (is_null($repository)) {
+    $result = null;
+} else {
+    $user = $repository->getUser(5);
+    if (is_null($user)) {
+        $result = null;
+    } else {
+        $result = $user->name;
+    }
+}
+?>
+```
+
