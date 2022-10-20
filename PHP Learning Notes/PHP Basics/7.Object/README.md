@@ -132,4 +132,4 @@ echo $obj->foo();  // call the method of instance
 
 **extend only once:** It is not possible to extend multiple classes; a class can only inherit from one base class.
 
-.
+..
