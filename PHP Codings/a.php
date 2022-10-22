@@ -1,24 +1,21 @@
 <?php
-class SimpleClass
-{
-    // property declaration
-    public $var = 'a default value';
-
-    // method declaration
-    public function displayVar() {
-        echo $this->var;
+class BaseClass {
+    function __construct() {
+        print "In BaseClass constructor\n";
     }
 }
-$instance = new SimpleClass();
 
-$assigned   =  $instance;
-$reference  =& $instance;
+class SubClass extends BaseClass {
+    protected int $x;
+    public float $y;
 
-//$instance->var = '$assigned will have this value';
-//
-//$instance = null; // $instance and $reference become null
+    function __construct(int $a, float $b) {
+        parent::__construct();
+        $x = $a;
+        $y = $b;
+        echo $x+$y;
+    }
+}
 
-var_dump($instance);
-var_dump($reference);
-var_dump($assigned);
+$obj = new SubClass(7,10.888);
 ?>
