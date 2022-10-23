@@ -159,10 +159,11 @@ class sampleClass
 }
 
 
+
 echo sampleClass::CONSTANT; //get the constant of sampleClass
 echo sampleClass::$kar;    //get the static property of sampleClass
 
-echo sampleClass::HELLO;   //can't fetch private constant
+//echo sampleClass::HELLO;   can't fetch private constant
 
 /*
  * use variable value as className
@@ -174,6 +175,7 @@ $obj = new sampleClass();
 echo $obj->bar;    // get the property of instance
 echo $obj->foo();  // call the method of instance
 echo $obj->showConstant(); 
+?>
 ```
 
 
@@ -181,9 +183,9 @@ echo $obj->showConstant();
 The visibility of a property, a method or (as of PHP 7.1.0) a constant can be defined by prefixing the declaration with the keywords public, protected or private.
 
 - Class members declared public can be accessed everywhere. In additional, Properties declared without any explicit visibility keyword are defined as public.
-  
+
 - Members declared protected can be accessed only within the class itself and by inheriting and parent classes.
-  
+
 - Members declared as private may only be accessed by the class that defines the member.
 
 ```php
@@ -367,8 +369,8 @@ $test->baz(new Test('other'));
 
 ### Extends other class
 
-**Class extension is an inheritance:**  
-1. A class can inherit the constants, methods, and properties of another class by using the keyword extends in the class declaration. 
+**Class extension is an inheritance:**
+1. A class can inherit the constants, methods, and properties of another class by using the keyword extends in the class declaration.
 
 2. The inherited constants, methods, and properties can be overridden by redeclaring them with the same name defined in the parent class.
 
@@ -402,7 +404,7 @@ $extended->displayVar();
 
 When overriding a method, its signature must be compatible with the parent method.
 
-A signature is compatible if it respects the variance rules, makes a mandatory parameter optional, and if any new parameters are optional. 
+A signature is compatible if it respects the variance rules, makes a mandatory parameter optional, and if any new parameters are optional.
 
 ```php
 <?php
@@ -437,9 +439,9 @@ $extended2 = new Extend2();
 $extended2->foo(1);
 ```
 
-#### “::class” syntax for fetching classname 
+#### “::class” syntax for fetching classname
 
-To obtain the fully qualified name of a class ClassName use ClassName::class. 
+To obtain the fully qualified name of a class ClassName use ClassName::class.
 
 ```php
 <?php
@@ -481,7 +483,7 @@ if (is_null($repository)) {
 
 PHP allows developers to declare constructor methods for classes. Classes which have a constructor method call this method on each newly-created object, so it is suitable for any initialization that the object may need before it is used.
 
-Parent constructors are not called implicitly if the child class defines a constructor. In order to run a parent constructor, a call to parent::__construct() within the child constructor is required. 
+Parent constructors are not called implicitly if the child class defines a constructor. In order to run a parent constructor, a call to parent::__construct() within the child constructor is required.
 
 If the child does not define a constructor then it may be inherited from the parent class just like a normal class method (if it was not declared as private).
 
