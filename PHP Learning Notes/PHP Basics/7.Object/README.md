@@ -62,10 +62,73 @@ var_dump(new (ClassD::class));
 ?>
 ```
 
+### Constructors
 
-### Rule of object assignment between values
+PHP allows developers to declare constructor methods for classes. Classes which have a constructor method call this method on each newly-created object, so it is suitable for any initialization that the object may need before it is used.
+
+Parent constructors are not called implicitly if the child class defines a constructor. In order to run a parent constructor, a call to parent::__construct() within the child constructor is required.
+
+If the child does not define a constructor then it may be inherited from the parent class just like a normal class method (if it was not declared as private).
+
+```php
+<?php
+class BaseClass {
+    function __construct() {
+        print "In BaseClass constructor\n";
+    }
+}
+
+class SubClass extends BaseClass {
+    protected int $x;
+    public float $y;
+    
+    function __construct(int $a, float $b) {
+        parent::__construct();
+        $x = $a;
+        $y = $b;
+        echo $x+$y;
+    }
+}
+
+class OtherSubClass extends BaseClass {
+    // inherits BaseClass's constructor
+}
+
+// In BaseClass constructor
+$obj = new BaseClass();
+
+// In BaseClass constructor
+// In SubClass constructor
+$obj = new SubClass();
+
+// In BaseClass constructor
+$obj = new OtherSubClass();
+?>
+
+```
+
+### Destructors
+PHP possesses a destructor concept similar to that of other object-oriented languages, such as C++. The destructor method will be called as soon as there are no other references to a particular object, or in any order during the shutdown sequence.
+
+```php
+<?php
+class MyDestructableClass 
+{
+    function __construct() {
+        print "In constructor\n";
+    }
+
+    function __destruct() {
+        print "Destroying " . __CLASS__ . "\n";
+    }
+}
+
+$obj = new MyDestructableClass();
+```
 
 
+
+### Rule of object assignment to variables
 
 ```php
 <?php
@@ -94,6 +157,44 @@ var_dump($instance);   // NULL
 var_dump($reference);  // still NULL
 var_dump($assigned);   // object(SimpleClass)#1 (1)
 
+
+?>
+```
+
+- example 2:
+
+```php
+<?php
+class Foo {
+  private static $used;
+  private $id;
+  public function __construct() {
+    $id = $used++;
+  }
+  public function __clone() {
+    $id = $used++;
+  }
+}
+
+$a = new Foo; // $a is a pointer pointing to Foo object 0
+$b = $a; // $b is a pointer pointing to Foo object 0, however, $b is a copy of $a
+$c = &$a; // $c and $a are now references of a pointer pointing to Foo object 0
+$a = new Foo; // $a and $c are now references of a pointer pointing to Foo object 1, $b is still a pointer pointing to Foo object 0
+unset($a); // A reference with reference count 1 is automatically converted back to a value. Now $c is a pointer to Foo object 1
+$a = &$b; // $a and $b are now references of a pointer pointing to Foo object 0
+$a = NULL; // $a and $b now become a reference to NULL. Foo object 0 can be garbage collected now
+unset($b); // $b no longer exists and $a is now NULL
+$a = clone $c; // $a is now a pointer to Foo object 2, $c remains a pointer to Foo object 1
+unset($c); // Foo object 1 can be garbage collected now.
+$c = $a; // $c and $a are pointers pointing to Foo object 2
+unset($a); // Foo object 2 is still pointed by $c
+$a = &$c; // Foo object 2 has 1 pointers pointing to it only, that pointer has 2 references: $a and $c;
+const ABC = TRUE;
+if(ABC) {
+  $a = NULL; // Foo object 2 can be garbage collected now because $a and $c are now a reference to the same NULL value
+} else {
+  unset($a); // Foo object 2 is still pointed to $c
+}
 
 ?>
 ```
@@ -178,6 +279,56 @@ echo $obj->showConstant();
 ?>
 ```
 
+### Static Keyword
+Declaring class properties or methods as static makes them accessible without needing an instantiation of the class.
+
+These can also be accessed statically within an instantiated class object.
+
+Static properties are accessed using the Scope Resolution Operator (::) and cannot be accessed through the object operator (->).
+
+**Don't use $this inside static methods:** Because static methods are callable without an instance of the object created, the pseudo-variable $this is not available inside methods declared as static.
+
+```php
+<?php
+class Foo {
+    public static $my_static = 'foo';
+    
+        
+    public static function aStaticMethod() {
+        // ...
+    }
+    
+    public function staticValue() {
+        return self::$my_static;
+    }
+
+}
+
+class Bar extends Foo
+{
+    public function fooStatic() {
+        return parent::$my_static;
+    }
+}
+
+//literal string as class name
+Foo::aStaticMethod();
+print Foo::$my_static . "\n";
+
+//no static method and property use "->"
+$foo = new Foo();
+print $foo->staticValue() . "\n";
+
+// use variable as class name
+$classname = 'Foo';
+$classname::aStaticMethod();
+
+/*
+ * inherit static property from parent class
+ */
+print Bar::$my_static . "\n";
+?>
+```
 
 ### Visibility
 The visibility of a property, a method or (as of PHP 7.1.0) a constant can be defined by prefixing the declaration with the keywords public, protected or private.
@@ -351,18 +502,70 @@ class Test
 
     public function baz(Test $other)
     {
-        // We can change the private property:
+        /*
+         * can access and modify other
+         * instance's private property
+         */  
         $other->foo = 'hello';
         var_dump($other->foo);
-
-        // We can also call the private method:
+        
+        /*
+         * can also call the private method
+         * instance's private property
+         */ 
         $other->bar();
     }
 }
 
 $test = new Test('test');
+$test->baz(new Test('other'));  
+?>
+```
 
-$test->baz(new Test('other'));
+### Final keyword
+The final keyword prevents child classes from overriding a method or constant by prefixing the definition with final. If the class itself is being defined final then it cannot be extended.
+
+- Final method:
+
+```php
+<?php
+class BaseClass {
+   public function test() {
+       echo "BaseClass::test() called\n";
+   }
+   
+   final public function moreTesting() {
+       echo "BaseClass::moreTesting() called\n";
+   }
+}
+
+class ChildClass extends BaseClass {
+   public function moreTesting() {
+       echo "ChildClass::moreTesting() called\n";
+   }
+}
+// Results in Fatal error: Cannot override final method BaseClass::moreTesting()
+?>
+```
+
+- final class:
+
+```php
+<?php
+final class BaseClass {
+   public function test() {
+       echo "BaseClass::test() called\n";
+   }
+
+   // As the class is already final, the final keyword is redundant
+   final public function moreTesting() {
+       echo "BaseClass::moreTesting() called\n";
+   }
+}
+
+class ChildClass extends BaseClass {
+}
+// Results in Fatal error: Class ChildClass may not inherit from final class (BaseClass)
 ?>
 ```
 
@@ -370,7 +573,7 @@ $test->baz(new Test('other'));
 ### Extends other class
 
 **Class extension is an inheritance:**
-1. A class can inherit the constants, methods, and properties of another class by using the keyword extends in the class declaration.
+1. when extending a class, the subclass inherits all of the constants, methods, and properties of another class by using the keyword extends in the class declaration.
 
 2. The inherited constants, methods, and properties can be overridden by redeclaring them with the same name defined in the parent class.
 
@@ -439,6 +642,70 @@ $extended2 = new Extend2();
 $extended2->foo(1);
 ```
 
+### The Scope Resolution Operator
+
+The Scope Resolution Operator is a token that allows access to static, constant, and overridden properties or methods of a class.
+
+When referencing these items from inside the class definition, use "self::" or "parent::"
+
+When referencing these items from outside the class definition, use the name of the class, for example: "sampleClass::"
+
+```php
+<?php
+class MyClass {
+    const CONST_VALUE = 'A constant value';
+    protected function myFunc() {
+        echo "MyClass::myFunc()\n";
+    }
+}
+
+echo MyClass::CONST_VALUE;
+
+/*
+ * use variable as class name
+ */
+$classname = 'MyClass';
+echo $classname::CONST_VALUE;
+
+/*
+ * Three special keywords self, parent and static are used to 
+ * access properties or methods from inside the class definition.
+ */
+
+class OtherClass extends MyClass
+{
+    public static $my_static = 'static var';
+
+    public static function doubleColon() {
+        echo parent::CONST_VALUE . "\n";
+        echo self::$my_static . "\n";
+    }
+    
+    
+    // Override parent's definition
+    public function myFunc()
+    {
+        // But still call the parent function
+        parent::myFunc();
+        echo "OtherClass::myFunc()\n";
+    }
+}
+
+$classname = 'OtherClass';
+$classname::doubleColon();
+
+OtherClass::doubleColon();
+
+
+/*
+ * call parent's method
+ */
+ 
+ 
+?>
+```
+
+
 #### “::class” syntax for fetching classname
 
 To obtain the fully qualified name of a class ClassName use ClassName::class.
@@ -479,70 +746,621 @@ if (is_null($repository)) {
 ?>
 ```
 
-### Constructors
 
-PHP allows developers to declare constructor methods for classes. Classes which have a constructor method call this method on each newly-created object, so it is suitable for any initialization that the object may need before it is used.
+### Abstract Class
+- PHP has abstract classes and methods. Classes defined as abstract cannot be instantiated, and any class that contains at least one abstract method must also be abstract.
 
-Parent constructors are not called implicitly if the child class defines a constructor. In order to run a parent constructor, a call to parent::__construct() within the child constructor is required.
+- Methods defined as abstract simply declare the method's signature; they cannot define the implementation.
 
-If the child does not define a constructor then it may be inherited from the parent class just like a normal class method (if it was not declared as private).
-
-```php
-<?php
-class BaseClass {
-    function __construct() {
-        print "In BaseClass constructor\n";
-    }
-}
-
-class SubClass extends BaseClass {
-    protected int $x;
-    public float $y;
-    
-    function __construct(int $a, float $b) {
-        parent::__construct();
-        $x = $a;
-        $y = $b;
-        echo $x+$y;
-    }
-}
-
-class OtherSubClass extends BaseClass {
-    // inherits BaseClass's constructor
-}
-
-// In BaseClass constructor
-$obj = new BaseClass();
-
-// In BaseClass constructor
-// In SubClass constructor
-$obj = new SubClass();
-
-// In BaseClass constructor
-$obj = new OtherSubClass();
-?>
-
-```
-
-### Destructors
-PHP possesses a destructor concept similar to that of other object-oriented languages, such as C++. The destructor method will be called as soon as there are no other references to a particular object, or in any order during the shutdown sequence.
+- When inheriting from an abstract class, all methods marked abstract in the parent's class declaration must be defined by the child class, and follow the usual inheritance and signature compatibility rules.
 
 ```php
 <?php
-class MyDestructableClass 
+/*
+ * Example about abstract class 
+ * and it's subclass extension usages
+ */
+abstract class AbstractClass
 {
-    function __construct() {
-        print "In constructor\n";
-    }
+    // Force Extending class to define this method
+    abstract protected function getValue();
+    abstract protected function prefixValue($prefix);
 
-    function __destruct() {
-        print "Destroying " . __CLASS__ . "\n";
+    // Common method
+    public function printOut() {
+        print $this->getValue() . "\n";
     }
 }
 
-$obj = new MyDestructableClass();
+class ConcreteClass1 extends AbstractClass
+{
+    protected function getValue() {
+        return "ConcreteClass1";
+    }
+
+    /*
+     * Our child class may define optional 
+     * arguments not in the parent's signature
+     */
+    public function prefixValue($prefix, $last = "last") {
+        return "{$prefix}ConcreteClass1{$last}";
+    }
+}
+
+class ConcreteClass2 extends AbstractClass
+{
+    public function getValue() {
+        return "ConcreteClass2";
+    }
+
+    public function prefixValue($prefix) {
+        return "{$prefix}ConcreteClass2";
+    }
+}
+
+$class1 = new ConcreteClass1;
+
+// get "ConcreteClass1"
+$class1->printOut();   
+
+//get "FOO_ConcreteClass1"
+echo $class1->prefixValue('FOO_') ."\n"; 
+
+$class2 = new ConcreteClass2;
+
+// get "ConcreteClass2"
+$class2->printOut();    
+
+//get "FOO_ConcreteClass2"
+
+echo $class2->prefixValue('FOO_') ."\n";  
+
+?>
 ```
 
+### Implement class interfaces
+
+- Object interfaces allow you to create code which specifies which methods a class must implement, without having to define how these methods are implemented. 
+  
+- Interfaces share a namespace with classes and traits, so they may not use the same name.
+
+- All methods declared in an interface must be public; this is the nature of an interface.
+
+- To implement an interface, the implements operator is used. All methods in the interface must be implemented within a class; failure to do so will result in a fatal error. 
+  
+- Classes may implement more than one interface if desired by separating each interface with a comma.
+
+```php
+<?php
+
+/*
+ * Declare the interface 'Template'
+ */
+interface Template
+{
+    public function setVariable($name, $var);
+    public function getHtml($template);
+}
+
+/*
+ * Implement the interface
+ * setVariable and getHtml must be implemented in this class
+ */
+class WorkingTemplate implements Template
+{
+    private $vars = [];
+  
+    public function setVariable($name, $var)
+    {
+        $this->vars[$name] = $var;
+    }
+  
+    public function getHtml($template)
+    {
+        foreach($this->vars as $name => $value) {
+            $template = str_replace('{' . $name . '}', $value, $template);
+        }
+ 
+        return $template;
+    }
+}
+
+// This will not work
+// Fatal error: Class BadTemplate contains 1 abstract methods
+// and must therefore be declared abstract (Template::getHtml)
+class BadTemplate implements Template
+{
+    private $vars = [];
+  
+    public function setVariable($name, $var)
+    {
+        $this->vars[$name] = $var;
+    }
+}
+?>
+```
+
+interface example 2:
+
+```php
+<?php
+interface A
+{
+    public function foo();
+}
+
+interface B extends A
+{
+    public function baz(Baz $baz);
+}
+
+// This will work
+class C implements B
+{
+    public function foo()
+    {
+    }
+
+    public function baz(Baz $baz)
+    {
+    }
+}
+
+// This will not work and result in a fatal error
+class D implements B
+{
+    public function foo()
+    {
+    }
+
+    public function baz(Foo $foo)
+    {
+    }
+}
+?>
+```
+
+### Traits
+
+- Traits are a mechanism for code reuse in single inheritance languages such as PHP. A Trait is intended to reduce some limitations of single inheritance by enabling a developer to reuse sets of methods freely in several independent classes living in different class hierarchies.
+
+- A Trait is similar to a class, but It is not possible to instantiate a Trait on its own.
+
+- **The precedence order is that methods from the current class override Trait methods, which in turn override methods from the base class.**
+
+```php
+<?php
+class Base {
+    public function sayHello() {
+        echo 'parent';
+    }
+}
+
+trait SayWorld {
+    public function sayHello() {
+        echo 'trait';
+    }
+}
+
+class MyHelloWorld extends Base {
+    use SayWorld;
+}
+
+class MyHelloWorld2 extends Base {
+    use SayWorld;
+    public function sayHello() {
+        echo 'MyHelloWorld2';
+    }   
+}
+
+$o = new MyHelloWorld();
+$o->sayHello();   //will get "trait"
+
+$j = new MyHelloWorld2();
+$j->sayHello(); //will get "MyHelloWorld2"
+?>
+```
+
+- Multiple Traits can be inserted into a class by listing them in the use statement, separated by commas.
+
+```php
+<?php
+trait Hello {
+    public function sayHello() {
+        echo 'Hello ';
+    }
+}
+
+trait World {
+    public function sayWorld() {
+        echo 'World';
+    }
+}
+
+class MyHelloWorld {
+    use Hello, World;
+    public function sayExclamationMark() {
+        echo '!';
+    }
+}
+
+$o = new MyHelloWorld();
+$o->sayHello();  //use trait method "sayHello"
+$o->sayWorld();  //use trait method "sayWorld"
+$o->sayExclamationMark();
+?>
+```
+
+- **Solve trait method name conflicts:**  If two Traits insert a method with the same name, a fatal error is produced, if the conflict is not explicitly resolved. To resolve naming conflicts between Traits used in the same class, the insteadof operator needs to be used to choose exactly one of the conflicting methods. Since this only allows one to exclude methods, the as operator can be used to add an alias to one of the methods. Note the as operator does not rename the method and it does not affect any other method either.
+
+
+```php
+<?php
+trait A {
+    public function smallTalk() {
+        echo 'a';
+    }
+    public function bigTalk() {
+        echo 'A';
+    }
+}
+
+trait B {
+    public function smallTalk() {
+        echo 'b';
+    }
+    public function bigTalk() {
+        echo 'B';
+    }
+}
+
+class Talker {
+    use A, B {
+        B::smallTalk insteadof A;
+        A::bigTalk insteadof B;
+    }
+}
+
+class Aliased_Talker {
+    use A, B {
+        B::smallTalk insteadof A;
+        A::bigTalk insteadof B;
+        B::bigTalk as talk;
+    }
+}
+?>
+```
+
+- Using the as syntax, one can also adjust the visibility of the method in the exhibiting class.
+
+```php
+<?php
+trait HelloWorld {
+    public function sayHello() {
+        echo 'Hello World!';
+    }
+}
+
+// Change visibility of sayHello
+class MyClass1 {
+    use HelloWorld { sayHello as protected; }
+}
+
+// Alias method with changed visibility
+// sayHello visibility not changed
+class MyClass2 {
+    use HelloWorld { sayHello as private myPrivateHello; }
+}
+?>
+```
+
+- static and abstract trait methods
+
+```php
+<?php
+/*
+ * static trait methods
+ */
+trait StaticExample {
+    public static function doSomething() {
+        return 'Doing something';
+    }
+}
+
+class Example {
+    use StaticExample;
+}
+
+Example::doSomething();
+
+
+/*
+ * abstract trait methods
+ */
+trait Hello {
+    public function sayHelloWorld() {
+        echo 'Hello'.$this->getWorld();
+    }
+    abstract public function getWorld();
+}
+
+class MyHelloWorld {
+    private $world;
+    use Hello;
+    public function getWorld() {
+        return $this->world;
+    }
+    public function setWorld($val) {
+        $this->world = $val;
+    }
+}
+?>
+```
+
+### Overloading in PHP
+
+Overloading in PHP provides means to dynamically create properties and methods. These dynamic entities are processed via magic methods one can establish in a class for various action types.
+
+**property overloading:**
+
+```php
+<?php
+class PropertyTest
+{
+    /**  Location for overloaded data.  */
+    private $data = array();
+
+    /**  Overloading not used on declared properties.  */
+    public $declared = 1;
+
+    /**  Overloading only used on this when accessed outside the class.  */
+    private $hidden = 2;
+
+    public function __set($name, $value)
+    {
+        echo "Setting '$name' to '$value'\n";
+        $this->data[$name] = $value;
+    }
+
+    public function __get($name)
+    {
+        echo "Getting '$name'\n";
+        if (array_key_exists($name, $this->data)) {
+            return $this->data[$name];
+        }
+
+        $trace = debug_backtrace();
+        trigger_error(
+            'Undefined property via __get(): ' . $name .
+            ' in ' . $trace[0]['file'] .
+            ' on line ' . $trace[0]['line'],
+            E_USER_NOTICE);
+        return null;
+    }
+
+    public function __isset($name)
+    {
+        echo "Is '$name' set?\n";
+        return isset($this->data[$name]);
+    }
+
+    public function __unset($name)
+    {
+        echo "Unsetting '$name'\n";
+        unset($this->data[$name]);
+    }
+
+    /**  Not a magic method, just here for example.  */
+    public function getHidden()
+    {
+        return $this->hidden;
+    }
+}
+
+
+echo "<pre>\n";
+
+$obj = new PropertyTest;
+
+$obj->a = 1;
+echo $obj->a . "\n\n";
+
+var_dump(isset($obj->a));
+unset($obj->a);
+var_dump(isset($obj->a));
+echo "\n";
+
+echo $obj->declared . "\n\n";
+
+echo "Let's experiment with the private property named 'hidden':\n";
+echo "Privates are visible inside the class, so __get() not used...\n";
+echo $obj->getHidden() . "\n";
+echo "Privates not visible outside of class, so __get() is used...\n";
+echo $obj->hidden . "\n";
+?>
+```
+
+**method overloading**
+
+```php
+<?php
+class MethodTest
+{
+    public function __call($name, $arguments)
+    {
+        // Note: value of $name is case sensitive.
+        echo "Calling object method '$name' "
+             . implode(', ', $arguments). "\n";
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        // Note: value of $name is case sensitive.
+        echo "Calling static method '$name' "
+             . implode(', ', $arguments). "\n";
+    }
+}
+
+$obj = new MethodTest;
+$obj->runTest('in object context');
+
+MethodTest::runTest('in static context');
+?>
+```
+
+### Object iteration
+For example:
+
+```php
+<?php
+class MyClass
+{
+    public $var1 = 'value 1';
+    public $var2 = 'value 2';
+    public $var3 = 'value 3';
+
+    protected $protected = 'protected var';
+    private   $private   = 'private var';
+
+    function iterateVisible() {
+       echo "MyClass::iterateVisible:\n";
+       foreach ($this as $key => $value) {
+           print "$key => $value\n";
+       }
+    }
+}
+
+$class = new MyClass();
+
+
+/*
+ * This will get:
+ * var1 => value 1
+ * var2 => value 2
+ * var3 => value 3
+ */
+
+foreach($class as $key => $value) {
+    print "$key => $value\n";
+}
+echo "\n";
+
+/*
+ * This will get:
+ * var1 => value 1
+ * var2 => value 2
+ * var3 => value 3
+ * protected => protected var
+ * private => private var
+ */
+$class->iterateVisible();
+
+?>
+```
+
+### Object Cloning
+
+Creating a copy of an object with fully replicated properties is not always the wanted behavior.
+
+An object copy is created by using the clone keyword (which calls the object's __clone() method if possible).
+
+When an object is cloned, PHP will perform a shallow copy of all of the object's properties. Any properties that are references to other variables will remain references.
+
+```php
+<?php
+class SubObject
+{
+    static $instances = 0;
+    public $instance;
+
+    public function __construct() {
+        $this->instance = ++self::$instances;
+    }
+
+    public function __clone() {
+        $this->instance = ++self::$instances;
+    }
+}
+
+class MyCloneable
+{
+    public $object1;
+    public $object2;
+
+    function __clone()
+    {
+        // Force a copy of this->object, otherwise
+        // it will point to same object.
+        $this->object1 = clone $this->object1;
+    }
+}
+
+$obj = new MyCloneable();
+
+$obj->object1 = new SubObject();
+$obj->object2 = new SubObject();
+
+/*
+ * According to __clone in MyCloneable
+ * object1 will be clone too
+ * but object2 will be just a copy-paste
+ */
+$obj2 = clone $obj;
+
+
+print("Original Object:\n");
+print_r($obj);
+
+print("Cloned Object:\n");
+print_r($obj2);
+
+?>
+```
+
+### Late static binding
+
+For example:
+
+```php
+<?php
+class A {
+    public static function who() {
+        echo __CLASS__;
+    }
+    public static function test() {
+        self::who();
+    }
+}
+
+class B extends A {
+    public static function who() {
+        echo __CLASS__;
+    }
+}
+
+B::test();  // would get "A"
+
+?>
+```
+
+```php
+class A {
+    public static function who() {
+        echo __CLASS__;
+    }
+    public static function test() {
+        static::who(); // Here comes Late Static Bindings
+    }
+}
+
+class B extends A {
+    public static function who() {
+        echo __CLASS__;
+    }
+}
+
+B::test();  // would get B
+```
 
 
 
@@ -576,5 +1394,41 @@ $obj2 = new MyClass2();
 ?>
 ```
 
-..
+
+### Object Serialization
+
+```php
+<?php
+// classa.inc:
+  
+  class A {
+      public $one = 1;
+    
+      public function show_one() {
+          echo $this->one;
+      }
+  }
+  
+// page1.php:
+
+  include("classa.inc");
+  
+  $a = new A;
+  $s = serialize($a);
+  // store $s somewhere where page2.php can find it.
+  file_put_contents('store', $s);
+
+// page2.php:
+  
+  // this is needed for the unserialize to work properly.
+  include("classa.inc");
+
+  $s = file_get_contents('store');
+  $a = unserialize($s);
+
+  // now use the function show_one() of the $a object.  
+  $a->show_one();
+?>
+```
+
 
